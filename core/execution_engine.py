@@ -16,10 +16,10 @@ logging.basicConfig(level=logging.INFO)
 # }
 
 def process_signal(signal):
-    symbol    = signal["symbol"]
-    side      = signal["side"]
-    stop_loss = float(signal["stop_loss"])
-    confidence= signal.get("confidence", 0)
+    symbol     = signal["symbol"]
+    side       = signal["side"]
+    stop_loss  = float(signal["stop_loss"])
+    confidence = signal.get("confidence", 0)
 
     logger.info(f"Received signal: {symbol} | {side.upper()} | confidence: {confidence} | stop: {stop_loss}")
 
@@ -32,32 +32,38 @@ def process_signal(signal):
         logger.error(f"Could not fetch price for {symbol}")
         return None
 
+    # 1. Calculate stop distance and position size
+    stop_distance = abs(price - stop_loss)
     qty = determine_position_size(price, stop_loss, risk_pct=0.01)
     if qty == 0:
         logger.warning(f"Position size calculated as 0 — skipping trade.")
         return None
 
+    # 2. Calculate take-profit (1.5R)
+    r_multiple_target = 1.5
+    if side == "buy":
+        take_profit = price + (stop_distance * r_multiple_target)
+    else:
+        take_profit = price - (stop_distance * r_multiple_target)
+
+    # 3. Submit order (can later add TP/SL as bracket order)
     order = submit_order(symbol=symbol, qty=qty, side=side)
     if order:
         logger.info(f"Executed trade: {order.id} | {symbol} | {side} | qty: {qty}")
-
-        # ─── HERE ───
-        # Build the dict and log to your journal DB:
+        
+        # Log trade to journal
         trade_data = {
-            "symbol":          symbol,
-            "qty":             qty,
-            "entry_price":     price,
-            "stop_loss":       stop_loss,
-            "risk_amount":     abs(price - stop_loss) * qty,
-            "confidence_score":confidence,
-            "setup_tag":       signal.get("setup_tag"),
-            # optional if you have them:
-            # "r_multiple":   some_r_multiple,
-            # "review_notes": "",
+            "symbol":           symbol,
+            "qty":              qty,
+            "entry_price":      price,
+            "stop_loss":        stop_loss,
+            "risk_amount":      stop_distance * qty,
+            "confidence_score": confidence,
+            "setup_tag":        signal.get("setup_tag"),
+            "r_multiple":       r_multiple_target,
+            "notes":            f"Take profit set at {take_profit:.2f}"
         }
         log_trade(trade_data)
-        # ────────────
-
     else:
         logger.error(f"Trade execution failed for {symbol} {side}")
 

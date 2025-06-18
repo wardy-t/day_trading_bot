@@ -75,6 +75,26 @@ def submit_order(symbol, qty, side, type="market", time_in_force="gtc", limit_pr
     except Exception as e:
         logger.error(f"Order failed: {e}")
         return None
+    
+
+def submit_bracket_order(symbol, qty, side, entry_price, stop_loss, take_profit):
+    try:
+        order = api.submit_order(
+            symbol=symbol,
+            qty=qty,
+            side=side,
+            type="limit",
+            time_in_force="gtc",
+            limit_price=entry_price,
+            order_class="bracket",
+            stop_loss={"stop_price": round(stop_loss, 2)},
+            take_profit={"limit_price": round(take_profit, 2)}
+        )
+        logger.info(f"Bracket order submitted: {order.id} for {symbol} ({side} {qty})")
+        return order
+    except Exception as e:
+        logger.exception(f"Failed to submit bracket order for {symbol}: {e}")
+        return None
 
 def cancel_order(order_id):
     try:
