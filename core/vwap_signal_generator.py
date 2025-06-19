@@ -6,7 +6,7 @@ from core.utils import calculate_vwap, calculate_rsi  # You will create these
 
 logger = logging.getLogger(__name__)
 
-from core.broker_interface import alpaca_api
+from core.broker_interface import api
 
 MARKET_TZ = pytz.timezone("America/New_York")
 START_TIME = datetime.time(hour=9, minute=35)
@@ -22,7 +22,7 @@ def generate_vwap_bounce_signal(symbol: str):
         return None
 
     try:
-        bars = alpaca_api.get_bars(symbol, TimeFrame.Minute, limit=50).df
+        bars = api.get_bars(symbol, TimeFrame.Minute, limit=50).df
         if bars.empty:
             logger.warning(f"No bar data for {symbol}")
             return None

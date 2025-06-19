@@ -32,36 +32,34 @@ def process_signal(signal):
         logger.error(f"Could not fetch price for {symbol}")
         return None
 
-    # 1. Calculate stop distance and position size
-    stop_distance = abs(price - stop_loss)
     qty = determine_position_size(price, stop_loss, risk_pct=0.01)
     if qty == 0:
-        logger.warning(f"Position size calculated as 0 — skipping trade.")
+        logger.warning("Position size calculated as 0 — skipping trade.")
         return None
 
-    # 2. Calculate take-profit (1.5R)
-    r_multiple_target = 1.5
-    if side == "buy":
-        take_profit = price + (stop_distance * r_multiple_target)
-    else:
-        take_profit = price - (stop_distance * r_multiple_target)
+    take_profit = round(price + abs(price - stop_loss) * 1.5, 2)
 
-    # 3. Submit order (can later add TP/SL as bracket order)
-    order = submit_order(symbol=symbol, qty=qty, side=side)
+    order = submit_bracket_order(
+        symbol=symbol,
+        qty=qty,
+        side=side,
+        entry_price=price,
+        stop_loss=stop_loss,
+        take_profit=take_profit
+    )
+
     if order:
         logger.info(f"Executed trade: {order.id} | {symbol} | {side} | qty: {qty}")
-        
-        # Log trade to journal
+
         trade_data = {
             "symbol":           symbol,
             "qty":              qty,
             "entry_price":      price,
             "stop_loss":        stop_loss,
-            "risk_amount":      stop_distance * qty,
+            "risk_amount":      abs(price - stop_loss) * qty,
             "confidence_score": confidence,
             "setup_tag":        signal.get("setup_tag"),
-            "r_multiple":       r_multiple_target,
-            "notes":            f"Take profit set at {take_profit:.2f}"
+            "r_multiple":       1.5,
         }
         log_trade(trade_data)
     else:
