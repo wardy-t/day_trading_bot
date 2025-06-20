@@ -8,8 +8,6 @@ from core.broker_interface import api
 
 logger = logging.getLogger(__name__)
 
-from core.broker_interface import api
-
 MARKET_TZ = pytz.timezone("America/New_York")
 START_TIME = datetime.time(hour=9, minute=35)
 END_TIME = datetime.time(hour=11, minute=0)
@@ -30,8 +28,10 @@ def generate_vwap_bounce_signal(symbol: str, max_retries: int = 3):
                 logger.warning(f"No bar data for {symbol}")
                 return None
 
-            bars = bars[bars['symbol'] == symbol]
+            # Fix: Reset index to expose 'timestamp' as a column
+            bars.reset_index(inplace=True)
             bars.set_index('timestamp', inplace=True)
+            bars.sort_index(inplace=True)
 
             price = bars['close'].iloc[-1]
             vwap = calculate_vwap(bars)

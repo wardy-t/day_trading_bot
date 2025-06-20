@@ -1,8 +1,4 @@
 mode: paper
 log_level: INFO
-allowed_symbols:
-  - AAPL
-  - MSFT
-  - TSLA
 max_position_size: 1000
 max_daily_loss: 500

@@ -93,3 +93,66 @@ def log_trade(trade_data):
 
     except Exception as e:
         logger.error(f"❌ Couldn’t log trade to DB: {e}")
+
+
+def get_open_trades():
+    """Fetch all trades from the DB that are still open."""
+    try:
+        conn = psycopg2.connect(**DB_PARAMS)
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT ref, symbol, num_shares, buy_price
+            FROM trades
+            WHERE sell_price = 0.0 AND sell_date IS NULL
+        """)
+        trades = cur.fetchall()
+        cur.close()
+        conn.close()
+
+        # Format as list of dicts for easier use
+        return [
+            {
+                "ref": row[0],
+                "symbol": row[1],
+                "qty": row[2],
+                "buy_price": row[3]
+            }
+            for row in trades
+        ]
+
+    except Exception as e:
+        logger.error(f"❌ Couldn’t fetch open trades: {e}")
+        return []
+    
+
+def update_closed_trade(update_data):
+    try:
+        conn = psycopg2.connect(**DB_PARAMS)
+        cur = conn.cursor()
+
+        update_sql = """
+        UPDATE trades
+        SET sell_date = %s,
+            sell_price = %s,
+            net_pnl = %s,
+            net_roi = %s
+        WHERE ref = %s
+        """
+
+        values = (
+            update_data["sell_date"],
+            update_data["sell_price"],
+            update_data["net_pnl"],
+            update_data["net_roi"],
+            update_data["ref"]
+        )
+
+        cur.execute(update_sql, values)
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        logger.info(f"✅ Trade ref {update_data['ref']} marked as closed.")
+    except Exception as e:
+        logger.error(f"❌ Failed to update closed trade: {e}")

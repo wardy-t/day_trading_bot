@@ -109,3 +109,14 @@ def get_order_status(order_id):
     except Exception as e:
         logger.error(f"Error checking order {order_id}: {e}")
         return None
+    
+def get_last_closed_order(symbol):
+    try:
+        orders = api.list_orders(status='closed', limit=10)
+        for order in orders:
+            if order.symbol == symbol and order.filled_avg_price is not None:
+                return order
+        return None
+    except Exception as e:
+        logger.error(f"Error fetching closed order for {symbol}: {e}")
+        return None

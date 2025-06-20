@@ -26,6 +26,7 @@ logger.info("Starting VWAP bounce scanner...")
 try:
     while True:
         for symbol in symbols:
+            logger.info(f"Scanning symbol: {symbol}")
             signal = generate_vwap_bounce_signal(symbol)
             if signal:
                 process_signal(signal)

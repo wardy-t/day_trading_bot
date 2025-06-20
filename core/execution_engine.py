@@ -2,6 +2,7 @@ import logging
 from core.broker_interface import get_price, submit_order, get_account
 from core.risk_manager import is_trade_allowed
 from core.journal_logger import log_trade
+from core.broker_interface import submit_bracket_order
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -67,17 +68,31 @@ def process_signal(signal):
 
     return order
 
-def determine_position_size(price, stop_loss, risk_pct=0.01):
+def determine_position_size(price, stop_loss, risk_pct=0.01, max_position_pct=0.03):
     account = get_account()
     if not account:
         return 0
 
     equity = float(account.equity)
+
+    # Capital you're willing to risk on this trade (e.g. 1% of equity)
     risk_capital = equity * risk_pct
+
+    # Maximum capital you're willing to commit to any single trade (e.g. 3%)
+    max_position_value = equity * max_position_pct
 
     stop_distance = abs(price - stop_loss)
     if stop_distance == 0:
         return 0
 
-    qty = int(risk_capital / stop_distance)
+    # Qty based on risk and stop loss
+    qty_based_on_risk = int(risk_capital / stop_distance)
+
+    # Qty based on total capital commitment limit
+    qty_based_on_exposure = int(max_position_value / price)
+
+    # Final qty is the smaller of the two
+    qty = min(qty_based_on_risk, qty_based_on_exposure)
+
+    logger.info(f"Qty calculated: risk-based = {qty_based_on_risk}, exposure-capped = {qty_based_on_exposure}, final = {qty}")
     return qty

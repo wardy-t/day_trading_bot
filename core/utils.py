@@ -13,4 +13,4 @@ def calculate_vwap(bars: pd.DataFrame):
         close=bars['close'],
         volume=bars['volume']
     )
-    return vwap.vwap().iloc[-1]
+    return vwap.vwap.iloc[-1]
