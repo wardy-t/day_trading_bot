@@ -9,8 +9,8 @@ from core.broker_interface import api
 logger = logging.getLogger(__name__)
 
 MARKET_TZ = pytz.timezone("America/New_York")
-START_TIME = datetime.time(hour=9, minute=35)
-END_TIME = datetime.time(hour=11, minute=0)
+START_TIME = datetime.time(hour=9, minute=45)
+END_TIME = datetime.time(hour=11, minute=30)
 
 def is_market_open_now():
     now = datetime.datetime.now(MARKET_TZ).time()

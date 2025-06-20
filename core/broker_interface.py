@@ -120,3 +120,16 @@ def get_last_closed_order(symbol):
     except Exception as e:
         logger.error(f"Error fetching closed order for {symbol}: {e}")
         return None
+
+def get_tradable_symbols():
+    try:
+        assets = api.list_assets(status="active")
+        tradable = [
+            asset.symbol for asset in assets
+            if asset.tradable and asset.exchange in ["NASDAQ", "NYSE", "AMEX"]
+        ]
+        logger.info(f"Loaded {len(tradable)} tradable symbols.")
+        return tradable
+    except Exception as e:
+        logger.error(f"Error fetching tradable symbols: {e}")
+        return []
