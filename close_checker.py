@@ -53,5 +53,5 @@ if __name__ == "__main__":
         except Exception as e:
             logger.exception(f"Error during close check: {e}")
 
-        logger.info("Sleeping for 60 seconds...")
-        time.sleep(60)
+        logger.info("Sleeping for 5 seconds...")
+        time.sleep(5)

@@ -3,6 +3,7 @@ from core.broker_interface import get_price, submit_order, get_account
 from core.risk_manager import is_trade_allowed
 from core.journal_logger import log_trade
 from core.broker_interface import submit_bracket_order
+from core.risk_manager import is_volatility_acceptable
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -17,6 +18,11 @@ logging.basicConfig(level=logging.INFO)
 # }
 
 def process_signal(signal):
+    # 🛑 VOLATILITY CHECK —
+    if not is_volatility_acceptable(threshold=20.0):  # You can tweak this threshold
+        logger.warning("🚨 Volatility too high — skipping trade.")
+        return None
+
     symbol     = signal["symbol"]
     side       = signal["side"]
     stop_loss  = float(signal["stop_loss"])
