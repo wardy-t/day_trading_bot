@@ -1,0 +1,4 @@
+mode: paper
+log_level: INFO
+max_position_size: 1000
+max_daily_loss: 500
