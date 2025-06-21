@@ -28,14 +28,25 @@ else:
         "SCHW", "CAT", "GS", "PLD", "GE", "ISRG", "LMT", "T", "NOW", "AMT",
         "ADI", "GILD", "ELV", "BLK", "ZTS", "SYK", "MO", "MMC", "C", "MDLZ",
         "DE", "ADP", "CI", "CB", "REGN", "USB", "SO", "CL", "VRTX", "PGR",
-        "TGT", "AXP", "APD", "BSX", "TJX", "DUK", "BDX", "ETN", "FIS", "PNC"
+        "TGT", "AXP", "APD", "BSX", "TJX", "DUK", "BDX", "ETN", "FIS", "PNC",
+        "GIS", "HUM", "ICE", "ILMN", "INFO", "ITW", "JKHY", "KLAC", "KMB", "KMI",
+        "KSS", "LHX", "LRCX", "LVS", "MAR", "MCHP", "MET", "MGM", "MSCI", "MTB",
+        "MU", "MCO", "NAP", "NEM", "NI", "NOC", "NTRS", "ODFL", "OKE", "ORLY",
+        "PAYX", "PNR", "PPG", "PSA", "PTON", "PXD", "QRVO", "RHI", "RJF", "ROL",
+        "ROP", "RSG", "SBUX", "SIVB", "SNPS", "STT", "SWKS", "SYY", "TRV", "TROW",
+        "TT", "TYL", "UDR", "VMC", "WAB", "WBA", "WDC", "WELL", "WMB", "WRB",
+        "WU", "WY", "XLNX", "XRAY", "YUM", "ZBRA", "ZBH", "ZION", "AEP", "AES",
+        "APTV", "BBY", "BLL", "CAH", "CHD", "CLX", "CMI", "CNP", "CNC", "COTY",
+        "CPRT", "CXO", "D", "DAL", "DD", "DFS", "DTE", "ECL", "EMR", "ETR",
+        "EW", "EXC", "EXR", "FAST", "FE", "FDX", "FLIR", "GLW", "GWW", "HAL",
+        "HCA", "HES", "HLT", "HOLX", "HPE"
     ]
 
 # -----------------------------
 # STEP 2: Scanning loop
 # -----------------------------
 
-SCAN_INTERVAL = 60  # seconds (adjust for frequency)
+SCAN_INTERVAL = 5  # seconds (adjust for frequency)
 logger.info("Starting VWAP bounce scanner...")
 
 try:
